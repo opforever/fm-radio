@@ -186,10 +186,10 @@
                     <div id="player-message" class="text-center text-red-500 h-5 mb-4 text-sm"></div>
 
                     <div class="flex items-center justify-center gap-6">
-                        <button id="prev-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg></button>
+                        <button id="prev-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg></button>
                         <button id="play-pause-btn" class="p-4 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition transform hover:scale-110"></button>
-                        <button id="next-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
-                        <button id="share-btn" class="absolute right-6 p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition" disabled title="Share Station"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg></button>
+                        <button id="next-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
+                        <button id="share-btn" class="absolute right-6 p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition" disabled title="Share Station"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg></button>
                     </div>
 
                     <div class="flex items-center justify-center gap-2 mt-6 w-4/5 mx-auto">
@@ -319,12 +319,12 @@
               mapBackBtn = getEl('map-back-btn');
 
         // Icons
-        const playIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`,
-              pauseIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`,
+        const playIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`,
+              pauseIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`,
               volumeMaxIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`,
               volumeMuteIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`,
-              starIconEmpty = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-amber-500 transition-colors"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`,
-              starIconFilled = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400 group-hover:text-amber-500 transition-colors"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`;
+              starIconEmpty = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400 group-hover:text-amber-500 transition-colors"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`,
+              starIconFilled = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-400 group-hover:text-amber-500 transition-colors"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`;
 
         // App State
         let activeApiBase = null, currentStations = [], currentStationIndex = -1, favorites = [],
@@ -335,7 +335,7 @@
         const applyTheme = (isDark) => {
             document.documentElement.classList.toggle('dark', isDark);
             document.documentElement.classList.toggle('light', !isDark);
-            themeToggle.checked = isDark;
+            if(themeToggle) themeToggle.checked = isDark;
             initParticles();
         };
         const savedTheme = localStorage.getItem('theme');
@@ -461,6 +461,20 @@
             throw new Error('All API servers unreachable.');
         }
 
+        async function isStreamOnline(url) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5 second timeout
+
+            try {
+                await fetch(url, { signal: controller.signal, mode: 'no-cors' });
+                clearTimeout(timeoutId);
+                return true;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                return false;
+            }
+        }
+        
         async function getCountries() {
             try {
                 const res = await fetch(`${activeApiBase}/countries?hidebroken=true&order=name`);
@@ -488,12 +502,29 @@
             showSkeletonLoaders();
             try {
                 const res = await fetch(`${activeApiBase}/stations/bycountrycodeexact/${countryCode}?hidebroken=true&limit=500&order=votes&reverse=true`);
-                currentStations = await res.json() || [];
-                if (currentStations.length > 0) {
-                    displayStations(currentStations);
-                    stationSearchInput.classList.remove('hidden');
-                }
-                else {
+                const allFetchedStations = await res.json() || [];
+
+                if (allFetchedStations.length > 0) {
+                    showMessage(`Found ${allFetchedStations.length} stations. Checking which are online...`);
+
+                    const stationChecks = allFetchedStations.map(async (station) => {
+                        const isOnline = await isStreamOnline(station.url_resolved);
+                        return { station, isOnline };
+                    });
+
+                    const results = await Promise.all(stationChecks);
+                    const onlineStations = results.filter(res => res.isOnline).map(res => res.station);
+
+                    currentStations = onlineStations;
+
+                    if (onlineStations.length > 0) {
+                        displayStations(onlineStations);
+                        stationSearchInput.classList.remove('hidden');
+                    } else {
+                        showMessage(`Could not find any online stations in this country. Please try another.`);
+                        stationSearchInput.classList.add('hidden');
+                    }
+                } else {
                     showMessage(`No stations found.`);
                     stationSearchInput.classList.add('hidden');
                 }
@@ -502,6 +533,7 @@
                 stationSearchInput.classList.add('hidden');
             }
         }
+
 
         function displayStations(stations) {
             stationsList.innerHTML = '';
