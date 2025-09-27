@@ -174,7 +174,7 @@
         <main class="w-full lg:flex-grow flex items-center justify-center z-20">
              <div class="player-card glass-card w-full max-w-lg p-6 rounded-2xl shadow-2xl text-center">
                  <div id="now-playing-section" class="flex flex-col items-center gap-4">
-                     <img id="station-favicon" src="https://placehold.co/128x128/7c3aed/ffffff?text=♫" alt="Station Art" class="w-32 h-32 rounded-2xl shadow-lg bg-gray-200/50 dark:bg-gray-700/50 transition-all duration-300">
+                     <img id="station-favicon" src="" alt="Station Art" class="w-32 h-32 rounded-2xl shadow-lg bg-gray-200/50 dark:bg-gray-700/50 transition-all duration-300">
                      <div>
                         <p class="text-sm uppercase tracking-widest text-gray-500 dark:text-gray-400">NOW PLAYING</p>
                         <h2 id="now-playing" class="text-2xl font-bold mt-1 truncate">Select a Station</h2>
@@ -187,7 +187,7 @@
 
                     <div class="flex items-center justify-center gap-6">
                         <button id="prev-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="19" x2="5" y2="5"></line></svg></button>
-                        <button id="play-pause-btn" class="p-4 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition transform hover:scale-110"></button>
+                        <button id="play-pause-btn" class="p-4 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition transform hover:scale-110 flex items-center justify-center"></button>
                         <button id="next-btn" class="p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="5" x2="19" y2="19"></line></svg></button>
                         <button id="share-btn" class="absolute right-6 p-2 rounded-full text-gray-600 dark:text-gray-400 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 disabled:opacity-50 transition" disabled title="Share Station"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13"></path></svg></button>
                     </div>
@@ -231,6 +231,14 @@
         // The complete, combined script follows this HTML structure.
     </script>
     <script type="module">
+        
+        // --- GLOBAL AUDIO CONTEXT & ANALYSER ---
+        let audioCtx, analyser, dataArray, bufferLength;
+        let beatDetection = {
+            history: [], historyLength: 60,
+            beatIntensity: 0, decay: 0.97
+        };
+
         // --- INTERACTIVE BACKGROUND SCRIPT ---
         const canvas = document.getElementById('interactive-bg');
         const ctx = canvas.getContext('2d');
@@ -246,8 +254,9 @@
                 this.size = size;
             }
             draw() {
+                const pulseSize = this.size * (1 + beatDetection.beatIntensity * 0.5);
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.arc(this.x, this.y, pulseSize, 0, Math.PI * 2, false);
                 ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--sub-text-color') + '33';
                 ctx.fill();
             }
@@ -266,6 +275,40 @@
                 this.draw();
             }
         }
+        
+        function detectBeat() {
+            if (!analyser || audioPlayer.paused) {
+                beatDetection.beatIntensity *= beatDetection.decay;
+                return;
+            }
+
+            analyser.getByteFrequencyData(dataArray);
+            
+            const bassFrequencies = dataArray.slice(0, 5);
+            let bassSum = 0;
+            for (const value of bassFrequencies) {
+                bassSum += value;
+            }
+            const currentBass = bassSum / bassFrequencies.length;
+
+            let historySum = 0;
+            for(const val of beatDetection.history) {
+                historySum += val;
+            }
+            const averageHistoryBass = beatDetection.history.length > 0 ? historySum / beatDetection.history.length : 0;
+            
+            if (currentBass > averageHistoryBass * 1.15 && currentBass > 40) {
+                beatDetection.beatIntensity = 1;
+            } else {
+                beatDetection.beatIntensity *= beatDetection.decay;
+            }
+
+            beatDetection.history.push(currentBass);
+            if (beatDetection.history.length > beatDetection.historyLength) {
+                beatDetection.history.shift();
+            }
+        }
+
 
         function initParticles() {
             particlesArray = [];
@@ -282,6 +325,7 @@
 
         function animateParticles() {
             requestAnimationFrame(animateParticles);
+            detectBeat();
             ctx.clearRect(0,0,innerWidth, innerHeight);
             if(particlesArray) particlesArray.forEach(p => p.update());
         }
@@ -328,7 +372,7 @@
 
         // App State
         let activeApiBase = null, currentStations = [], currentStationIndex = -1, favorites = [],
-            recents = [], sleepTimer = null, audioCtx, analyser, isViewMap = false,
+            recents = [], sleepTimer = null, isViewMap = false,
             lastSelectedCountryCode = null, allStationsForMap = [];
 
         // --- Feature: Theme Management ---
@@ -394,6 +438,32 @@
         });
 
         // --- UI & API Helpers ---
+        function stringToColor(str) {
+            let hash = 0;
+            if (!str || str.length === 0) return '#4f46e5';
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            let color = '#';
+            for (let i = 0; i < 3; i++) {
+                let value = (hash >> (i * 8)) & 0xFF;
+                value = Math.floor((value + 128) / 2); // Ensure colors are not too dark
+                color += ('00' + value.toString(16)).substr(-2);
+            }
+            return color;
+        }
+
+        function generateSvgPlaceholder(name) {
+            const initial = name ? name.charAt(0).toUpperCase() : '♫';
+            const bgColor = stringToColor(name || 'default');
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="${bgColor}"/><text x="50%" y="55%" font-family="Inter, sans-serif" font-size="50" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">${initial}</text></svg>`;
+            // Use unescape and encodeURIComponent to handle non-Latin1 characters
+            return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+        }
+        
+        stationFavicon.src = generateSvgPlaceholder('');
+
+
         const showMessage = (msg) => { stationsList.innerHTML = ''; messageDisplay.innerHTML = msg; messageDisplay.style.display = 'flex'; };
         const showSkeletonLoaders = () => {
             stationsList.innerHTML = ''; messageDisplay.style.display = 'none';
@@ -466,6 +536,7 @@
             const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5 second timeout
 
             try {
+                // Using 'no-cors' is a trick to ping the server. It won't return data but will succeed if reachable.
                 await fetch(url, { signal: controller.signal, mode: 'no-cors' });
                 clearTimeout(timeoutId);
                 return true;
@@ -501,19 +572,20 @@
             if (!activeApiBase) return;
             showSkeletonLoaders();
             try {
-                const res = await fetch(`${activeApiBase}/stations/bycountrycodeexact/${countryCode}?hidebroken=true&limit=500&order=votes&reverse=true`);
+                const res = await fetch(`${activeApiBase}/stations/bycountrycodeexact/${countryCode}?hidebroken=true&limit=100&order=votes&reverse=true`); // Limit initial fetch
                 const allFetchedStations = await res.json() || [];
 
                 if (allFetchedStations.length > 0) {
-                    showMessage(`Found ${allFetchedStations.length} stations. Checking which are online...`);
+                    showMessage(`Found ${allFetchedStations.length} stations. Verifying which are online...`);
 
-                    const stationChecks = allFetchedStations.map(async (station) => {
-                        const isOnline = await isStreamOnline(station.url_resolved);
-                        return { station, isOnline };
-                    });
-
-                    const results = await Promise.all(stationChecks);
-                    const onlineStations = results.filter(res => res.isOnline).map(res => res.station);
+                    const stationChecks = allFetchedStations.map(async (station) => ({
+                        station,
+                        isOnline: await isStreamOnline(station.url_resolved)
+                    }));
+                    
+                    const onlineStations = (await Promise.all(stationChecks))
+                        .filter(res => res.isOnline)
+                        .map(res => res.station);
 
                     currentStations = onlineStations;
 
@@ -545,18 +617,23 @@
 
                 const mainContent = document.createElement('div');
                 mainContent.className = 'flex items-center gap-4 flex-grow overflow-hidden cursor-pointer';
-                mainContent.innerHTML = `
-                    <img src="${station.favicon || 'https://placehold.co/48x48/7c3aed/ffffff?text=♫'}" alt="${station.name} logo" class="w-12 h-12 rounded-lg object-cover bg-gray-200/50 dark:bg-gray-700/50 flex-shrink-0" onerror="this.src='https://placehold.co/48x48/7c3aed/ffffff?text=♫'">
-                    <div class="overflow-hidden">
-                        <h3 class="font-semibold truncate">${station.name}</h3>
-                        <p class="text-sm truncate" style="color: var(--sub-text-color);">${station.tags.split(',').slice(0, 2).join(', ') || 'Radio'}</p>
-                    </div>`;
+
+                const img = document.createElement('img');
+                img.alt = `${station.name} logo`;
+                img.className = 'w-12 h-12 rounded-lg object-cover bg-gray-200/50 dark:bg-gray-700/50 flex-shrink-0';
+                img.src = station.favicon || generateSvgPlaceholder(station.name);
+                img.onerror = () => { img.src = generateSvgPlaceholder(station.name); img.onerror = null; };
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'overflow-hidden';
+                textDiv.innerHTML = `<h3 class="font-semibold truncate">${station.name}</h3><p class="text-sm truncate" style="color: var(--sub-text-color);">${station.tags.split(',').slice(0, 2).join(', ') || 'Radio'}</p>`;
+                
+                mainContent.append(img, textDiv);
                 mainContent.addEventListener('click', () => playStation(station));
 
                 const favButton = document.createElement('button');
                 favButton.className = 'p-2 rounded-full hover:bg-gray-200/50 dark:hover:bg-gray-600/50 ml-auto flex-shrink-0 group';
-                const isFavorite = favorites.includes(station.stationuuid);
-                favButton.innerHTML = isFavorite ? starIconFilled : starIconEmpty;
+                favButton.innerHTML = favorites.includes(station.stationuuid) ? starIconFilled : starIconEmpty;
                 favButton.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(station, favButton); });
                 
                 el.append(mainContent, favButton);
@@ -589,7 +666,11 @@
         function updatePlayerUI(station) {
             playerMessage.textContent = '';
             nowPlaying.textContent = station ? station.name : 'Select a Station';
-            stationFavicon.src = station ? (station.favicon || 'https://placehold.co/128x128/7c3aed/ffffff?text=♫') : 'https://placehold.co/128x128/7c3aed/ffffff?text=♫';
+            const newFaviconSrc = station ? (station.favicon || generateSvgPlaceholder(station.name)) : generateSvgPlaceholder('');
+            if (stationFavicon.src !== newFaviconSrc) {
+                stationFavicon.src = newFaviconSrc;
+            }
+            stationFavicon.onerror = () => { stationFavicon.src = generateSvgPlaceholder(station.name); stationFavicon.onerror = null; };
             document.title = station ? `▶ ${station.name} | GlobalWave` : 'GlobalWave';
             updatePlayerControlsState();
         }
@@ -667,7 +748,6 @@
         // --- Feature: Live Audio Visualizer ---
         const visualizerCanvas = getEl('visualizer');
         const visualizerCtx = visualizerCanvas.getContext('2d');
-        let dataArray, bufferLength;
         
         function setupVisualizer() {
             try {
@@ -692,6 +772,7 @@
                 visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
                 return;
             };
+            if(!dataArray) dataArray = new Uint8Array(bufferLength);
             analyser.getByteFrequencyData(dataArray);
 
             visualizerCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
