@@ -44,7 +44,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             transition: background-color 0.3s ease, color 0.3s ease;
-            overflow: hidden; /* Prevent scrollbars from main content */
+            overflow-x: hidden;
         }
         #interactive-bg {
             position: fixed; top: 0; left: 0;
@@ -116,6 +116,56 @@
             white-space: nowrap;
             z-index: 100;
         }
+
+        @media (max-width: 1023px) { /* Corresponds to Tailwind's 'lg' breakpoint */
+            body {
+                overflow: hidden;
+            }
+            #app-container {
+                height: 100vh; /* Fallback */
+                height: 100dvh;
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+            aside {
+                flex: 1;
+                min-height: 0;
+            }
+            main {
+                flex-shrink: 0;
+            }
+            .glass-card.p-6 {
+                padding: 1rem;
+            }
+            #stations-container {
+                flex-grow: 1;
+            }
+            .player-card {
+                padding: 1rem;
+            }
+            #now-playing-section {
+                flex-direction: row;
+                text-align: left;
+            }
+            #station-favicon {
+                width: 4rem; /* 64px */
+                height: 4rem; /* 64px */
+                flex-shrink: 0;
+            }
+            #now-playing {
+                font-size: 1.125rem; /* from text-2xl to text-lg */
+            }
+            .player-card > .mt-8 {
+                margin-top: 1rem;
+            }
+            #visualizer {
+                height: 3rem; /* 48px */
+                margin-bottom: 0.5rem;
+            }
+            .player-card .mt-6 {
+                margin-top: 1rem;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -123,7 +173,7 @@
     
     <div id="app-container" class="relative min-h-screen container mx-auto p-4 flex flex-col lg:flex-row gap-8">
         <!-- Left Sidebar: Controls and Stations List -->
-        <aside class="w-full lg/w-1/3 lg:max-w-md flex flex-col gap-6 z-20">
+        <aside class="w-full lg:w-1/3 lg:max-w-md flex flex-col gap-6 z-20">
             <header class="text-left">
                 <h1 class="text-4xl font-extrabold text-indigo-600 dark:text-indigo-400">GlobalWave</h1>
                 <p class="text-lg text-gray-600 dark:text-gray-400 mt-1">Your portal to the world's radio.</p>
